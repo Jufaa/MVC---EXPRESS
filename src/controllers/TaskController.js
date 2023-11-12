@@ -1,14 +1,22 @@
 const TaskService = require("../services/TaskService");
-
+const NotFoundError = require("../exceptions/NotFoundError");
+const ValidationError = require("../exceptions/ValidationError");
+const taskMapper = require("../mapper/taskMapper");
 const TaskController = {
   getAllTasks: async (req, res) => {
     try {
       const tasks = await TaskService.getAllTasks();
-      res.json(tasks);
+      const mappedTasks = tasks.map(taskMapper.TaskReponseDTO);
+
+      res.json(mappedTasks);
     } catch (error) {
-      res
-        .status(500)
-        .json({ mensaje: error.message || "Error al obtener las tareas" });
+      if (error instanceof NotFoundError) {
+        res.status(404).json({ mensaje: error.message });
+      } else if (error instanceof ValidationError) {
+        res.status(500).json({ mensaje: error.message });
+      } else {
+        res.status(500).json({ mensaje: "Error interno del servidor" });
+      }
     }
   },
 
@@ -16,9 +24,17 @@ const TaskController = {
     const { id } = req.params;
     try {
       const task = await TaskService.getOneTask(id);
-      res.json(task);
+      const mapTask = taskMapper.TaskReponseDTO(task);
+
+      res.json(mapTask);
     } catch (error) {
-      res.status(404).json({ mensaje: error.message || "Tarea no encontrada" });
+      if (error instanceof NotFoundError) {
+        res.status(404).json({ mensaje: error.message });
+      } else if (error instanceof ValidationError) {
+        res.status(500).json({ mensaje: error.message });
+      } else {
+        res.status(500).json({ mensaje: "Error interno del servidor" });
+      }
     }
   },
 
@@ -26,11 +42,16 @@ const TaskController = {
     const taskData = req.body;
     try {
       const task = await TaskService.createTask(taskData);
-      res.json(task);
+      const mapperTask = taskMapper.TaskReponseDTO(task);
+      res.json(mapperTask);
     } catch (error) {
-      res
-        .status(500)
-        .json({ mensaje: error.message || "Error al crear la tarea" });
+      if (error instanceof NotFoundError) {
+        res.status(404).json({ mensaje: error.message });
+      } else if (error instanceof ValidationError) {
+        res.status(500).json({ mensaje: error.message });
+      } else {
+        res.status(500).json({ mensaje: "Error interno del servidor" });
+      }
     }
   },
 
@@ -39,9 +60,17 @@ const TaskController = {
     const updatedTaskData = req.body;
     try {
       const task = await TaskService.putTask(id, updatedTaskData);
-      res.json(task);
+      const mapperTask = taskMapper.TaskReponseDTO(task);
+
+      res.json(mapperTask);
     } catch (error) {
-      res.status(404).json({ mensaje: error.message || "Tarea no encontrada" });
+      if (error instanceof NotFoundError) {
+        res.status(404).json({ mensaje: error.message });
+      } else if (error instanceof ValidationError) {
+        res.status(500).json({ mensaje: error.message });
+      } else {
+        res.status(500).json({ mensaje: "Error interno del servidor" });
+      }
     }
   },
 
@@ -49,9 +78,17 @@ const TaskController = {
     const { id } = req.params;
     try {
       const task = await TaskService.deleteTask(id);
-      res.json(task);
+      const mapperTask = taskMapper.TaskReponseDTO(task);
+
+      res.json(mapperTask);
     } catch (error) {
-      res.status(404).json({ mensaje: error.message || "Tarea no encontrada" });
+      if (error instanceof NotFoundError) {
+        res.status(404).json({ mensaje: error.message });
+      } else if (error instanceof ValidationError) {
+        res.status(500).json({ mensaje: error.message });
+      } else {
+        res.status(500).json({ mensaje: "Error interno del servidor" });
+      }
     }
   },
 };
