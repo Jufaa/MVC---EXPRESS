@@ -1,12 +1,18 @@
-const TaskService = require("../services/TaskService");
-const NotFoundError = require("../exceptions/NotFoundError");
-const ValidationError = require("../exceptions/ValidationError");
-const taskMapper = require("../mapper/taskMapper");
+import TaskService from "../services/TaskService";
+import NotFoundError from "../exceptions/NotFoundError";
+import ValidationError from "../exceptions/ValidationError";
+import TaskDTO from "../dto/TaskDTO";
+import { TaskReponseDTO } from "../mapper/taskMapper";
+
 const TaskController = {
   getAllTasks: async (req, res) => {
     try {
       const tasks = await TaskService.getAllTasks();
-      const mappedTasks = tasks.map(taskMapper.TaskReponseDTO);
+      const mappedTasks = tasks.map((task) =>
+        TaskReponseDTO(
+          new TaskDTO(task._id, task.title, task.description, task.status)
+        )
+      );
 
       res.json(mappedTasks);
     } catch (error) {
@@ -24,7 +30,9 @@ const TaskController = {
     const { id } = req.params;
     try {
       const task = await TaskService.getOneTask(id);
-      const mapTask = taskMapper.TaskReponseDTO(task);
+      const mapTask = TaskReponseDTO(
+        new TaskDTO(task._id, task.title, task.description, task.status)
+      );
 
       res.json(mapTask);
     } catch (error) {
@@ -42,7 +50,9 @@ const TaskController = {
     const taskData = req.body;
     try {
       const task = await TaskService.createTask(taskData);
-      const mapperTask = taskMapper.TaskReponseDTO(task);
+      const mapperTask = TaskReponseDTO(
+        new TaskDTO(task._id, task.title, task.description, task.status)
+      );
       res.json(mapperTask);
     } catch (error) {
       if (error instanceof NotFoundError) {
@@ -60,7 +70,9 @@ const TaskController = {
     const updatedTaskData = req.body;
     try {
       const task = await TaskService.putTask(id, updatedTaskData);
-      const mapperTask = taskMapper.TaskReponseDTO(task);
+      const mapperTask = TaskReponseDTO(
+        new TaskDTO(task._id, task.title, task.description, task.status)
+      );
 
       res.json(mapperTask);
     } catch (error) {
@@ -78,7 +90,9 @@ const TaskController = {
     const { id } = req.params;
     try {
       const task = await TaskService.deleteTask(id);
-      const mapperTask = taskMapper.TaskReponseDTO(task);
+      const mapperTask = TaskReponseDTO(
+        new TaskDTO(task._id, task.title, task.description, task.status)
+      );
 
       res.json(mapperTask);
     } catch (error) {
@@ -93,4 +107,4 @@ const TaskController = {
   },
 };
 
-module.exports = TaskController;
+export default TaskController;

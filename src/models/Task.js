@@ -1,13 +1,13 @@
-const mongoose = require("mongoose");
-const TaskStatus = require("../enums/taskStatus");
+import { Schema, model } from "mongoose";
+import TaskStatus, { PENDING } from "../enums/taskStatus";
 
-const taskScheme = new mongoose.Schema({
+const taskScheme = new Schema({
   title: String,
   description: String,
   status: {
     type: String,
     enum: Object.values(TaskStatus),
-    default: TaskStatus.PENDING,
+    default: PENDING,
   },
   date: {
     type: Date,
@@ -15,6 +15,6 @@ const taskScheme = new mongoose.Schema({
   },
 });
 
-const Task = mongoose.model("Task", taskScheme);
+const Task = model("Task", taskScheme);
 
-module.exports = Task;
+export default Task;

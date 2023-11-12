@@ -1,26 +1,31 @@
-// repository/taskRepository.js
-const Task = require("../models/Task");
+import {
+  find,
+  findById,
+  create,
+  findByIdAndUpdate,
+  findByIdAndDelete,
+} from "../models/Task";
 
 const taskRepository = {
   getAllTasks: async () => {
-    return await Task.find();
+    return await find();
   },
 
   getTaskById: async (taskId) => {
-    return await Task.findById(taskId);
+    return await findById(taskId);
   },
 
   createTask: async (taskData) => {
-    return await Task.create(taskData);
+    return await create(taskData);
   },
 
   updateTask: async (taskId, updatedTaskData) => {
-    return await Task.findByIdAndUpdate(taskId, updatedTaskData, { new: true });
+    return await findByIdAndUpdate(taskId, updatedTaskData, { new: true });
   },
 
   deleteTask: async (taskId) => {
-    return await Task.findByIdAndDelete(taskId);
+    return await findByIdAndDelete(taskId);
   },
 };
 
-module.exports = taskRepository;
+export default taskRepository;

@@ -1,10 +1,16 @@
-const taskRepository = require("../repository/taskRepository");
-const ValidationError = require("../exceptions/ValidationError");
-const NotFoundError = require("../exceptions/NotFoundError");
+import {
+  getAllTasks as _getAllTasks,
+  getTaskById,
+  createTask as _createTask,
+  updateTask,
+  deleteTask as _deleteTask,
+} from "../repository/taskRepository";
+import ValidationError from "../exceptions/ValidationError";
+import NotFoundError from "../exceptions/NotFoundError";
 const TaskService = {
   getAllTasks: async () => {
     try {
-      return await taskRepository.getAllTasks();
+      return await _getAllTasks();
     } catch (error) {
       throw new Error("Error al obtener las tareas", error);
     }
@@ -12,7 +18,7 @@ const TaskService = {
 
   getOneTask: async (taskId) => {
     try {
-      const task = await taskRepository.getTaskById(taskId);
+      const task = await getTaskById(taskId);
       if (!task) {
         throw new NotFoundError("Tarea no encontrada");
       }
@@ -24,7 +30,7 @@ const TaskService = {
 
   createTask: async (taskData) => {
     try {
-      return await taskRepository.createTask(taskData);
+      return await _createTask(taskData);
     } catch (error) {
       throw new ValidationError("Error al crear la tarea", error);
     }
@@ -32,7 +38,7 @@ const TaskService = {
 
   putTask: async (taskId, updatedTaskData) => {
     try {
-      const task = await taskRepository.updateTask(taskId, updatedTaskData, {
+      const task = await updateTask(taskId, updatedTaskData, {
         new: true,
       });
       if (!task) {
@@ -46,7 +52,7 @@ const TaskService = {
 
   deleteTask: async (taskId) => {
     try {
-      const task = await taskRepository.deleteTask(taskId);
+      const task = await _deleteTask(taskId);
       if (!task) {
         throw new NotFoundError("Tarea no encontrada");
       }
@@ -57,4 +63,4 @@ const TaskService = {
   },
 };
 
-module.exports = TaskService;
+export default TaskService;

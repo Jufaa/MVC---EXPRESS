@@ -4,4 +4,4 @@ const TaskStatus = {
   COMPLETED: "COMPLETED",
 };
 
-module.exports = TaskStatus;
+export default TaskStatus;
