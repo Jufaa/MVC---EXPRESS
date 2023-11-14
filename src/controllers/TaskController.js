@@ -1,110 +1,74 @@
 import TaskService from "../services/TaskService";
 import NotFoundError from "../exceptions/NotFoundError";
-import ValidationError from "../exceptions/ValidationError";
+import TaskMapper from "../mapper/TaskMapper";
 import TaskDTO from "../dto/TaskDTO";
-import { TaskReponseDTO } from "../mapper/taskMapper";
 
 const TaskController = {
-  getAllTasks: async (req, res) => {
-    try {
-      const tasks = await TaskService.getAllTasks();
-      const mappedTasks = tasks.map((task) =>
-        TaskReponseDTO(
-          new TaskDTO(task._id, task.title, task.description, task.status)
-        )
-      );
+    getAllTasks: async (req, res) => {
+        try {
+            const tasks = await TaskService.getAllTasks();
+            const taskResponseDTOs = res.json(TaskMapper.toResponseDTO(tasks));
 
-      res.json(mappedTasks);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).json({ mensaje: error.message });
-      } else if (error instanceof ValidationError) {
-        res.status(500).json({ mensaje: error.message });
-      } else {
-        res.status(500).json({ mensaje: "Error interno del servidor" });
-      }
-    }
-  },
+          if (taskResponseDTOs.size === 0){
+            return res.status(404).json({message: "There are no tasks"});
+          }
+          return taskResponseDTOs;
+        } catch (error) {
+            return res.status(500).json({message: "There where an error while fetching the tasks"});
+        }
+    },
 
-  getOneTask: async (req, res) => {
-    const { id } = req.params;
-    try {
-      const task = await TaskService.getOneTask(id);
-      const mapTask = TaskReponseDTO(
-        new TaskDTO(task._id, task.title, task.description, task.status)
-      );
+    getOneTask: async (req, res) => {
+        const {id} = req.params;
+        try {
+            const task = await TaskService.getOneTask(id);
+            const taskResponse = res.json(TaskMapper.toResponseDTO(task));
 
-      res.json(mapTask);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).json({ mensaje: error.message });
-      } else if (error instanceof ValidationError) {
-        res.status(500).json({ mensaje: error.message });
-      } else {
-        res.status(500).json({ mensaje: "Error interno del servidor" });
-      }
-    }
-  },
+            if (taskResponse == null){
+                return res.status(404).json({message: "There is no task with that id"});
+            }
+            return taskResponse;
+        } catch (error) {
+            return res.status(500).json({message: "There where an error while fetching the task"});
+        }
+    },
 
-  createTask: async (req, res) => {
-    const taskData = req.body;
-    try {
-      const task = await TaskService.createTask(taskData);
-      const mapperTask = TaskReponseDTO(
-        new TaskDTO(task._id, task.title, task.description, task.status)
-      );
-      res.json(mapperTask);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).json({ mensaje: error.message });
-      } else if (error instanceof ValidationError) {
-        res.status(500).json({ mensaje: error.message });
-      } else {
-        res.status(500).json({ mensaje: "Error interno del servidor" });
-      }
-    }
-  },
+    createTask: async (req, res) => {
+        const taskData = TaskDTO.build(req.body);
 
-  putTask: async (req, res) => {
-    const { id } = req.params;
-    const updatedTaskData = req.body;
-    try {
-      const task = await TaskService.putTask(id, updatedTaskData);
-      const mapperTask = TaskReponseDTO(
-        new TaskDTO(task._id, task.title, task.description, task.status)
-      );
+        try {
+            const task = await TaskService.createTask(taskData);
+            return res.json(TaskMapper.toResponseDTO(task));
+        } catch (error) {
+           return res.status(500).json({message: "There where an error while creating the task"});
+        }
+    },
 
-      res.json(mapperTask);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).json({ mensaje: error.message });
-      } else if (error instanceof ValidationError) {
-        res.status(500).json({ mensaje: error.message });
-      } else {
-        res.status(500).json({ mensaje: "Error interno del servidor" });
-      }
-    }
-  },
+    putTask: async (req, res) => {
+        const {id} = req.params;
+        const updatedTaskData = TaskDTO.build(req.body);
 
-  deleteTask: async (req, res) => {
-    const { id } = req.params;
-    try {
-      const task = await TaskService.deleteTask(id);
-      const mapperTask = TaskReponseDTO(
-        new TaskDTO(task._id, task.title, task.description, task.status)
-      );
+        try {
+            const task = await TaskService.putTask(id, updatedTaskData);
+            return res.json(TaskMapper.toResponseDTO(task));
+        } catch (error) {
+           return res.status(500).json({message: "There where an error while updating the task"});
+        }
+    },
 
-      res.json(mapperTask);
-    } catch (error) {
-      if (error instanceof NotFoundError) {
-        res.status(404).json({ mensaje: error.message });
-      } else if (error instanceof ValidationError) {
-        res.status(500).json({ mensaje: error.message });
-      } else {
-        res.status(500).json({ mensaje: "Error interno del servidor" });
-      }
-    }
-  },
+    deleteTask: async (req, res) => {
+        const {id} = req.params;
+        try {
+            const task = await TaskService.deleteTask(id);
+            return res.json(TaskMapper.toResponseDTO(task));
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                return res.status(404).json({message: "There is no task with that id"});
+            } else {
+                return res.status(500).json({message: "There where an error while fetching the task"});
+            }
+        }
+    },
 };
 
 export default TaskController;
