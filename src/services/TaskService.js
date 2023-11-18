@@ -1,64 +1,48 @@
-import {
-  getAllTasks as _getAllTasks,
-  getTaskById,
-  createTask as _createTask,
-  updateTask,
-  deleteTask as _deleteTask,
-} from "../repository/taskRepository";
-import ValidationError from "../exceptions/ValidationError";
-import NotFoundError from "../exceptions/NotFoundError";
+import taskRepository from "../repository/taskRepository.js";
+import ValidationError from "../exceptions/ValidationError.js";
+import NotFoundError from "../exceptions/NotFoundError.js";
 const TaskService = {
   getAllTasks: async () => {
     try {
-      return await _getAllTasks();
+      return taskRepository.getAllTasksRepository();
     } catch (error) {
-      throw new Error("Error al obtener las tareas", error);
+      throw new Error("Error getting tasks", error);
     }
   },
 
   getOneTask: async (taskId) => {
     try {
-      const task = await getTaskById(taskId);
+      const task = taskRepository.getTaskByIdRepository(taskId);
       if (!task) {
-        throw new NotFoundError("Tarea no encontrada");
+        throw new NotFoundError("Task not found");
       }
       return task;
     } catch (error) {
-      throw new ValidationError("Error al obtener la tarea", error);
+      throw new ValidationError("Error getting task", error);
     }
   },
 
   createTask: async (taskData) => {
     try {
-      return await _createTask(taskData);
+      return await taskRepository.createTaskRepository(taskData);
     } catch (error) {
-      throw new ValidationError("Error al crear la tarea", error);
+      throw new ValidationError("Error creating task", error);
     }
   },
 
   putTask: async (taskId, updatedTaskData) => {
     try {
-      const task = await updateTask(taskId, updatedTaskData, {
-        new: true,
-      });
-      if (!task) {
-        throw new NotFoundError("Tarea no encontrada");
-      }
-      return task;
+      return taskRepository.updateTaskRepository(taskId, updatedTaskData);
     } catch (error) {
-      throw new ValidationError("Error al actualizar la tarea");
+      throw new ValidationError("Error update task");
     }
   },
 
   deleteTask: async (taskId) => {
     try {
-      const task = await _deleteTask(taskId);
-      if (!task) {
-        throw new NotFoundError("Tarea no encontrada");
-      }
-      return task;
+      return taskRepository.deleteTaskRepository(taskId);
     } catch (error) {
-      throw new ValidationError("Error al eliminar la tarea");
+      throw new ValidationError("Error delete task");
     }
   },
 };

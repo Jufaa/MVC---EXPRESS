@@ -1,13 +1,13 @@
-import { Schema, model } from "mongoose";
-import TaskStatus, { PENDING } from "../enums/taskStatus";
+import TaskStatus from "../enums/taskStatus.js";
+import mongoose from "mongoose";
 
-const taskScheme = new Schema({
+const taskSchema = new mongoose.Schema({
   title: String,
   description: String,
   status: {
     type: String,
     enum: Object.values(TaskStatus),
-    default: PENDING,
+    default: TaskStatus.PENDING,
   },
   date: {
     type: Date,
@@ -15,6 +15,6 @@ const taskScheme = new Schema({
   },
 });
 
-const Task = model("Task", taskScheme);
+const Task = mongoose.model("Task", taskSchema);
 
 export default Task;

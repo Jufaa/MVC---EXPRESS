@@ -1,30 +1,31 @@
-import {
-  find,
-  findById,
-  create,
-  findByIdAndUpdate,
-  findByIdAndDelete,
-} from "../models/Task";
+import Task from "../models/Task.js";
 
 const taskRepository = {
-  getAllTasks: async () => {
-    return await find();
+  getAllTasksRepository: () => {
+    return Task.find();
   },
 
-  getTaskById: async (taskId) => {
-    return await findById(taskId);
+  getTaskByIdRepository: (taskId) => {
+    return Task.findById(taskId);
   },
 
-  createTask: async (taskData) => {
-    return await create(taskData);
+  createTaskRepository: async (taskData) => {
+    try {
+      const newTask = new Task(taskData);
+
+      return await newTask.save();
+    } catch (error) {
+      console.error("Error creating task:", error);
+      throw error;
+    }
   },
 
-  updateTask: async (taskId, updatedTaskData) => {
-    return await findByIdAndUpdate(taskId, updatedTaskData, { new: true });
+  updateTaskRepository: (taskId, updatedTaskData) => {
+    return Task.findByIdAndUpdate(taskId, updatedTaskData, { new: true });
   },
 
-  deleteTask: async (taskId) => {
-    return await findByIdAndDelete(taskId);
+  deleteTaskRepository: (taskId) => {
+    return Task.findByIdAndDelete(taskId);
   },
 };
 
